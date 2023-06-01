@@ -28,23 +28,18 @@ class UserSerializer(serializers.ModelSerializer):
             "password": {"write_only":True},
         }
 
-    def create(self, data):
-        username = data.get("username")
+    def create(self, data): #requested data
+        username = data.get("username")   
         email = data.get("email")
         password = data.get("password")
-
+        
         try:
             validate_password(password)
         except ValidationError as e:
             raise serializers.ValidationError(e.messages)
         else:
             if email:
-                emailTaken = User.objects.filter(email=email).exists()
-                if not emailTaken:
-                    user = User.objects.create(username=username,email=email,password=password)
-                else:
-                    raise serializers.ValidationError("This email is already taken.")
+                user = User.objects.create_user(username=username,email=email,password=password)  
             else:
-                user = User.objects.create_user(username=username,password=password)
-                
+                user = User.objects.create_user(username=username,password=password)   
             return user
