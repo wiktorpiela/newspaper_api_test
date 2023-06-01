@@ -45,6 +45,6 @@ class UserSerializer(serializers.ModelSerializer):
                 else:
                     raise serializers.ValidationError("This email is already taken.")
             else:
-                user = User.objects.create(username=username,password=password)
+                user = User.objects.create_user(username=username,password=password)
                 
             return user
