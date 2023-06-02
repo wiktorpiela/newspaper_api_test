@@ -6,13 +6,15 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework.validators import UniqueValidator
 
 class ArticleSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField()
     class Meta:
         model = Article
         fields = ("id", "title", "text", "date", "author",)
         read_only_fields = ("id", "date", "author") #te ktorych nie chce dostawac przy wysyłaniu requesta
 
 class UserSerializer(serializers.ModelSerializer):
-    articles = serializers.PrimaryKeyRelatedField(many=True, queryset=Article.objects.all())
+    articles = serializers.HyperlinkedRelatedField(many=True, queryset=Article.objects.all(), view_name="articleDetails")
+
     email = serializers.EmailField(
         required = False,
         validators=[UniqueValidator(
