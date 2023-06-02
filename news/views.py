@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework.permissions import AllowAny, IsAdminUser
 from .permission import IsOwnerReadOnly
+from rest_framework.reverse import reverse
 
 #all articles list and creating new one       
 class ArticleList(generics.ListCreateAPIView):
@@ -33,3 +34,11 @@ class UserView(generics.ListCreateAPIView):
 
     def get_permissions(self):
         return [IsAdminUser() if self.request.method == "GET" else AllowAny()]
+    
+class APIRoot(APIView):
+    def get(self, request, format=None):
+        links = {
+            "articles": reverse("articles", request=request, format=format),
+            "users": reverse("users", request=request, format=format)
+        }
+        return Response(links)
