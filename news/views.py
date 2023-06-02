@@ -12,7 +12,18 @@ from .permission import IsOwnerReadOnly
 from rest_framework.reverse import reverse
 from .paginators import ArticlePaginator
 
-#all articles list and creating new one       
+#all articles list and creating new one  
+@api_view(["GET","POST"])
+def articles(request):
+    paginator_class = ArticlePaginator()
+
+    if request.method == "GET":
+        articles = Article.objects.all()
+        pages = paginator_class.paginate_queryset(articles, request)
+        serializer = ArticleSerializer(pages, many=True)
+        return paginator_class.get_paginated_response(serializer.data)
+        #return Response(serializer.data, status=status.HTTP_200_OK)
+
 class ArticleList(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
@@ -23,13 +34,11 @@ class ArticleList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-
 #get single article details, delete or update them
 class ArticleDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = [IsOwnerReadOnly]
-
 
 #display all users and create new one
 class UserView(generics.ListCreateAPIView):
