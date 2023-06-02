@@ -3,18 +3,22 @@ from django.contrib.auth.models import User
 from .serializers import ArticleSerializer, UserSerializer
 from django.http import JsonResponse
 from rest_framework.response import Response
-from rest_framework import status, mixins, generics
+from rest_framework import status, mixins, generics, filters
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework.permissions import AllowAny, IsAdminUser
 from .permission import IsOwnerReadOnly
 from rest_framework.reverse import reverse
+from .paginators import ArticlePaginator
 
 #all articles list and creating new one       
 class ArticleList(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+    pagination_class = ArticlePaginator
+    filter_backends = [filters.OrderingFilter]
+    ordering = ["-date"]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
