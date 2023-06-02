@@ -15,6 +15,9 @@ class ArticleList(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 #get single article details, delete or update them
 class ArticleDetails(generics.RetrieveUpdateDestroyAPIView):
